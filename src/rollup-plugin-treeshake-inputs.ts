@@ -58,6 +58,7 @@ export function rollupPluginTreeshakeInputs(allImports: InstallTarget[]) {
         }
         ${`export {${[...uniqueNamedImports].join(',')}} from '${escapedFileLoc}';`}
       `;
+      process.platform === 'win32' && console.log(result);
       return result;
     },
   };
