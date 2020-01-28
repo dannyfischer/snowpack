@@ -13,6 +13,10 @@ import {InstallTarget} from './scan-imports';
  */
 export function rollupPluginTreeshakeInputs(allImports: InstallTarget[]) {
   const installTargetsByFile: {[loc: string]: InstallTarget[]} = {};
+  if (process.platform === 'win32') {
+    console.log('imports:');
+    console.log(allImports);
+  }
   return {
     name: 'pika:treeshake-inputs',
     // Mark some inputs for tree-shaking.
@@ -27,19 +31,32 @@ export function rollupPluginTreeshakeInputs(allImports: InstallTarget[]) {
           inputOptions.input[key] = `pika-treeshake:${val}`;
         }
       }
+      if (process.platform === 'win32') {
+        console.log('optionsreturned:');
+        console.log(inputOptions);
+      }
       return inputOptions;
     },
     resolveId(source: string) {
+      if (process.platform === 'win32') {
+        console.log('resolveId: ' + source);
+      }
       if (source.startsWith('pika-treeshake:')) {
-        return source;
+        return source.substring('pika-treeshake:'.length);
       }
       return null;
     },
     load(id: string) {
+      if (process.platform === 'win32') {
+        console.log('load: ' + id);
+      }
       if (!id.startsWith('pika-treeshake:')) {
         return null;
       }
       const fileLoc = id.substring('pika-treeshake:'.length);
+      if (process.platform === 'win32') {
+        console.log('fileLoc: ' + fileLoc);
+      }
       // Reduce all install targets into a single "summarized" install target.
       const treeshakeSummary = installTargetsByFile[fileLoc].reduce((summary, imp) => {
         summary.default = summary.default || imp.default;
@@ -48,15 +65,20 @@ export function rollupPluginTreeshakeInputs(allImports: InstallTarget[]) {
         return summary;
       });
       const uniqueNamedImports = new Set(treeshakeSummary.named);
+      const escapedFileLoc = fileLoc.replace('\\', '\\\\');
       const result = `
-        ${treeshakeSummary.namespace ? `export * from '${fileLoc}';` : ''}
+        ${treeshakeSummary.namespace ? `export * from '${escapedFileLoc}';` : ''}
         ${
           treeshakeSummary.default
-            ? `import __pika_web_default_export_for_treeshaking__ from '${fileLoc}'; export default __pika_web_default_export_for_treeshaking__;`
+            ? `import __pika_web_default_export_for_treeshaking__ from '${escapedFileLoc}'; export default __pika_web_default_export_for_treeshaking__;`
             : ''
         }
-        ${`export {${[...uniqueNamedImports].join(',')}} from '${fileLoc}';`}
+        ${`export {${[...uniqueNamedImports].join(',')}} from '${escapedFileLoc}';`}
       `;
+      if (process.platform === 'win32') {
+        console.log('result');
+        console.log(result);
+      }
       return result;
     },
   };
