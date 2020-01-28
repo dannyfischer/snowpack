@@ -31,7 +31,7 @@ export function rollupPluginTreeshakeInputs(allImports: InstallTarget[]) {
     },
     resolveId(source: string) {
       if (source.startsWith('pika-treeshake:')) {
-        return source.substring('pika-treeshake:'.length);
+        return source;
       }
       return null;
     },
