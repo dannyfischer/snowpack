@@ -101,7 +101,6 @@ const PACKAGES_TO_AUTO_DETECT_EXPORTS = [
 function detectExports(filePath: string): string[] | undefined {
   try {
     const fileLoc = resolveFrom(cwd, filePath);
-    process.platform === 'win32' && console.log(`detectExports: ${fileLoc}`);
     if (fs.existsSync(fileLoc)) {
       return Object.keys(require(fileLoc)).filter(e => e[0] !== '_');
     }
