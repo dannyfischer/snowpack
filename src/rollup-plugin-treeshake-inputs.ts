@@ -38,6 +38,7 @@ export function rollupPluginTreeshakeInputs(allImports: InstallTarget[]) {
       return null;
     },
     load(id: string) {
+      process.platform === 'win32' && console.log(`load: ${id}`);
       if (!id.startsWith('pika-treeshake:')) {
         return null;
       }
