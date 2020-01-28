@@ -27,6 +27,7 @@ export function rollupPluginTreeshakeInputs(allImports: InstallTarget[]) {
           inputOptions.input[key] = `pika-treeshake:${val}`;
         }
       }
+      console.log(inputOptions);
       return inputOptions;
     },
     resolveId(source: string, importer: string) {
